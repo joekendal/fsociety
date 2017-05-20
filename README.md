@@ -7,8 +7,7 @@ a self-destructing, randomly generated key.
 The fuxsocy.py script is based on Darlene's malware shown in Mr Robot
 
 ## S2E1:
-
-![alt text](https://i.imgur.com/6RIogYa.jpg)
+https://i.imgur.com/6RIogYa.jpg
 
 ![](https://gifyu.com/images/ezgif.com-video-to-giff0eda.gif)
 
