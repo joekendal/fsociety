@@ -25,7 +25,7 @@ sudo pip3 install pycrypto
 ### Usage:
 
 ```shell
-curl https://raw.githubusercontent.com/joekendal/fsociety/master/fuxsocy.py
+wget https://raw.githubusercontent.com/joekendal/fsociety/master/fuxsocy.py
 ```
 ```shell
 sudo chmod +x fuxsocy.py
