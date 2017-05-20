@@ -19,7 +19,7 @@ The fuxsocy.py script is based on Darlene's malware shown in Mr Robot
 sudo apt install python3 python3-pip
 ```
 ```shell
-pip3 install pycrypto
+sudo pip3 install pycrypto
 ```
 
 ### Usage:
