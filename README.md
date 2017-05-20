@@ -12,14 +12,14 @@ The fuxsocy.py script is based on Darlene's malware shown in Mr Robot
 
 ### Dependencies:
 
-* Python3
+* python
 * pycrypto
 
 ```shell
-sudo apt install python3 python3-pip
+sudo apt install python python-pip
 ```
 ```shell
-sudo pip3 install pycrypto
+sudo pip install pycrypto
 ```
 
 ### Usage:
