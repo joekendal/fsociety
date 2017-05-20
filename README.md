@@ -10,6 +10,8 @@ The fuxsocy.py script is based on Darlene's malware shown in Mr Robot
 
 ![alt text](https://i.imgur.com/6RIogYa.jpg)
 
+[![ezgif.com-video-to-giff0eda.gif](https://gifyu.com/images/ezgif.com-video-to-giff0eda.gif)](https://gifyu.com/image/b9ys)
+
 ### Dependencies:
 
 * python
