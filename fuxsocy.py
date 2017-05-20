@@ -10,13 +10,10 @@ from random import SystemRandom
 
 
 def encrypt(filepath, key):
-    file_size = str(os.path.getsize(filepath)).zfill(16)
     initialization_vector = Random.new().read(16)
     encryptor = AES.new(key, AES.MODE_CBC, initialization_vector)
-    with open(file_path, 'rb') as infile:
-        with open(file_path, 'wb') as outfile:
-            outfile.write(file_size.encode('utf-8'))
-            outfile.write(initialization_vector)
+    with open(filepath, 'rb') as infile:
+        with open(filepath, 'wb') as outfile:
             while True:
                 chunk = infile.read(65536)
                 if len(chunk) == 0:
