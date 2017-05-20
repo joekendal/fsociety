@@ -4,7 +4,7 @@ __WARNING: do not actually execute this. You will not be able to recover the fil
 This is intended to encrypt every bit of data in a unix filesystem using 256-bit AES with 
 a self-destructing, randomly generated key.
 
-The fuxsocy.py script is based on Darlene's malware [shown](https://gifyu.com/images/ezgif.com-video-to-giff0eda.gif) in Mr Robot
+The [fuxsocy.py](https://i.imgur.com/tAvWBe6.jpg) script is based on Darlene's malware [shown](https://gifyu.com/images/ezgif.com-video-to-giff0eda.gif) in Mr Robot
 
 ## S2E1:
 ![alt-text](https://i.imgur.com/6RIogYa.jpg)
