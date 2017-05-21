@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 import os
 import subprocess
 import sys
@@ -48,7 +49,6 @@ def generate_keys(source):
         keys.append(SHA256.new(''.join(SystemRandom().choice(source) for x in range(SystemRandom().randint(128, 256)) for x in range(128, 256))).digest())
         if i % 3 == 0:
             update_progress(((i + 1.0) / 3.0))
-
     print "\n"
     return keys
 
