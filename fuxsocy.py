@@ -46,7 +46,7 @@ def generate_keys(source):
     print "Generating Keys"
     keys = []
     for i in range(9):
-        keys.append(SHA256.new(''.join(SystemRandom().choice(source) for x in range(SystemRandom().randint(128, 256)) for x in range(128, 256))).digest())
+        keys.append(SHA256.new(''.join(SystemRandom().choice(source) for x in range(SystemRandom().randint(128, 256)) for x in range(SystemRandom().randint(128, 256)))).digest())
         if i % 3 == 0:
             update_progress(((i + 1.0) / 3.0))
     print "\n"
